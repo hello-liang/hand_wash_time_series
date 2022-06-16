@@ -6,12 +6,15 @@ with open(os.path.join("/media/liang/ssd2/wash_hand_3/Domain-and-View-point-Agno
 skels = np.array([list(map(float, l.split())) for l in skels])
 '''
 
-
+import pickle
 import numpy as np
 from data_generator import DataGenerator
-import prediction_utils
+#import prediction_utils
 import load_data_file_deploy
-model_params = prediction_utils.load_model("./pretrained_models/xdom_summarization", False, loss_name="mixknn_best")
+#model_params = prediction_utils.load_model("./pretrained_models/xdom_summarization", False, loss_name="mixknn_best")
+f= open('store.pckl','rb')
+model_params=pickle.load(f)
+f.close()
 
 
 #in put a matrix ,output a matrix

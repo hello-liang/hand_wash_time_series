@@ -11,11 +11,10 @@ from scipy.spatial.transform import Rotation as R
 import scipy.ndimage.interpolation as inter
 from scipy.special import comb
 from scipy.spatial.distance import cdist
-from tensorflow.keras.utils import to_categorical 
-from tensorflow.keras.preprocessing.sequence import pad_sequences
 
 
-# from __OLD_data_generator_obj import DataGenerator_Hand
+
+
 
 """
 
@@ -404,164 +403,7 @@ class DataGenerator():
     # if max_seq_len > 0 -> samples inside a batch are zoomed-out to fit max_seq_len
     # if max_seq_len < 0 -> samples bigger than max_seq_len are randomly cropped to fit -max_seq_len
     # @threadsafe_generator	
-    def triplet_data_generator(self, pose_annotations_file, 
-                               batch_size, 
-                               in_memory_generator, 
-                               validation,
-                               decoder, reverse_decoder,
-                               triplet, 
-                               classification, num_classes,
-                               
-                               
-                               # skip_frames = [],
-                               average_wrong_skels = True,
-                               is_tcn=False,
-                               K=4,
-                               in_memory_skels=False,
-                               sample_repetitions=1,
-                               **kwargs):
-        
-        
-            # Reads the annotations and stores them into a dict by label. Annotations are shuffled
-            def read_annotations():
-                pose_files = {}
-                with open(pose_annotations_file, 'r') as f: 
-                    for line in f:
-                        filename, label = line.split()
-                        label = int(label)
-                        if label in pose_files: pose_files[label].append(filename)
-                        else: pose_files[label] = [filename]
-                for k in pose_files.keys(): np.random.shuffle(pose_files[k])
-                return pose_files
-        
-            # Return a random sample with the given label or a random one if there is no 
-            # more samples with that label
-            def get_random_sample(label):
-                if label in pose_files and len(pose_files[label]) > 0:
-                    return pose_files[label].pop(), label
-                else:
-                    if label in pose_files: del pose_files[label]
-                    new_label = np.random.choice(list(pose_files.keys()))
-                    return get_random_sample(new_label)        
-            
-            if in_memory_generator: 
-                #print(' ** Data Generator | data will be cached | Validation: {} **'.format(validation))
-                cached_data = {}    
-            if in_memory_skels: 
-                #print(' ** Data Generator | skeleton sequences be cached | Validation: {} **'.format(validation))
-                cached_skels = {}
-                
-            if validation: sample_repetitions = 1
-    
-            
-            if validation:
-                batch_size = batch_size // K
-                K = 1
-    
-            assert batch_size % K == 0
-            P = batch_size // K
-            pose_files = read_annotations()
-        #    print('*************', K, P, batch_size, self.use_rotations)
-            
-            if classification:
-                total_labels = sorted(list(pose_files.keys()))
-                labels_dict = { l:i for i,l in enumerate(total_labels) }
-                
-                
-            rotation_matrix = None
-            print(self.use_rotations)
-            print(' *** batch_size: {} - K: {} - P: {} - sample_repetitions: {}'.format(
-                batch_size, K, P, sample_repetitions))
-            
-            while True:
-                if sum([ len(v) for v in pose_files.values() ]) < batch_size:
-                    pose_files = read_annotations()
-                    
-                batch_labels = []
-                batch_samples = []
-                if classification: y_clf = []
-                if not validation and self.use_rotations == 'by_batch': rotation_matrix = self.get_random_rotation_matrix()
-               
-                
-                # if triplet and triplet_individual_labels: label_ind: 0
-                if triplet:
-                    # Positive pairs rotated together must have the same label
-                    # Samples not rotated, rotated equally within batch or rotated randomly must have the original label
-                    triplet_labels = []
-                    if self.use_rotations == 'by_positive': triplet_label_ind = 0
-                
-                for num_p in range(P):      # For each group of triplet classes
-                    # Get a random positive class
-                    # label_iter = np.random.choice(list(pose_files.keys()))  
-                    if triplet:
-                        available_classes = [ c for c in pose_files.keys() if c not in list(set(batch_labels)) ]
-                    if not triplet or len(available_classes) == 0:
-                        available_classes = list(pose_files.keys())
-                    label_iter = np.random.choice(available_classes)  # Random positive class
-                    
-                    if not validation and self.use_rotations == 'by_positive': 
-                        rotation_matrix = self.get_random_rotation_matrix()
-                        triplet_label_ind += 1
-                    
-                    for i in range(K):              # For each positive sample within positive group     
-                        filename, label = get_random_sample(label_iter)
-                        
-                        for num_rep in range(sample_repetitions):
-                            if classification:      # Get classification y_true
-                                label_cat = to_categorical(labels_dict[int(label)], num_classes=num_classes)                
-                        
-                            if in_memory_generator and filename in cached_data.keys():
-                                # Get sample from cache
-                                sample = cached_data[filename]
-                            else:
-                                if in_memory_skels and filename in cached_skels:
-                                    p = cached_skels[filename]
-                                else:
-                                    # Calculate (and store) new sample features
-                                    p = self.load_skel_coords(filename)
-                                    if average_wrong_skels: p = self.average_wrong_frame_skels(p)
-                                    if in_memory_skels: cached_skels[filename] = p
-                                sample = self.get_pose_data_v2(p, validation, rotation_matrix=rotation_matrix)
-                                if in_memory_generator: cached_data[filename] = sample
-                                
-                            batch_samples.append(sample)
-                            batch_labels.append(label)
-                            if triplet:
-                                if not validation and self.use_rotations == 'by_positive': triplet_labels.append(triplet_label_ind)
-                                else: triplet_labels.append(label)
-                            
-                            if classification: y_clf.append(label_cat)   
-                            
-                    
-                
-                # Pack triplet labels and classification y_true
-                if triplet: 
-                    batch_labels = np.stack(batch_labels)       # for triplets
-                    triplet_labels = np.stack(triplet_labels)       # for triplets
-                if classification: y_clf = np.stack(y_clf).astype('int')              # for classification                
-                    
-                X, Y, sample_weights = [], [], {}
-                X = pad_sequences(batch_samples, abs(self.max_seq_len), padding='pre', dtype='float32')    # Pack NN input            
-                    
-                # if triplet: Y.append(batch_labels)
-                if triplet: Y.append(triplet_labels)
-                if classification: Y.append(y_clf)
-                if decoder:
-                    decoder_data = [ bs[::-1] for bs in batch_samples ] if reverse_decoder else batch_samples
-                    padding = 'pre' if is_tcn else 'post'
-                    # decoder_data = pad_sequences(decoder_data, padding='post', dtype='float32')
-                    decoder_data = pad_sequences(decoder_data, padding=padding, dtype='float32')
-                    Y.append(decoder_data)
-                    sample_weights['output_{}'.format(len(Y))] =  (decoder_data[:, :, 0] != 0).astype('float32')
-                    
-                    # if reverse_decoder: Y.append(batch_samples[:, ::-1, :])
-                    # else: Y.append(batch_samples)
-                    # sample_weights['output_{}'.format(len(Y))] =  (Y[-1][:, :, 0] != 0).astype('float32')
-                    
-                Y = np.concatenate(Y)
-                yield X, Y              
-           
-        # return aux()
+
 
 
 if __name__ == '__main__':
@@ -619,12 +461,7 @@ if __name__ == '__main__':
             'K': 2
         }
 
-    triplet_gen = data_gen.triplet_data_generator(**gen_params)
-    for i in range(3):
-        batch_X, batch_Y = next(triplet_gen)
-        # batch_X, batch_Y, batch_sample_weights = next(triplet_gen)
-        # batch_X, batch_Y, batch_sample_weights, batch_rot = next(triplet_gen)
-        batch_Y = batch_Y[0]
+
     
         
         
