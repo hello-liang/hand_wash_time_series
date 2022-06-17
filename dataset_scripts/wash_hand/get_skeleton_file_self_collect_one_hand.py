@@ -9,6 +9,8 @@ mp_drawing_styles = mp.solutions.drawing_styles
 mp_hands = mp.solutions.hands
 import re
 
+input="collect_data_batch_3"
+output="collect_data_batch_3_one_hand"
 
 # 50 guys do 6 action
 def process_output_skelenton_to_array(results):
@@ -29,15 +31,15 @@ def process_output_skelenton_to_array(results):
 # For static images:
 with mp_hands.Hands(model_complexity=0, min_detection_confidence=0.5, min_tracking_confidence=0.5) as hands:
     path_data='/media/liang/ssd2/wash_hand_3/Domain-and-View-point-Agnostic-Hand-Action-Recognition-main/datasets/'
-    for action in os.listdir(path_data + 'collect_data_batch_3/'):
+    for action in os.listdir(path_data + input+'/'):
         v_i = 0
-        for video in os.listdir(path_data + 'collect_data_batch_3/' + action):
+        for video in os.listdir(path_data + input+'/' + action):
             v_i = v_i + 1
             # For webcam input:
-            cap = cv2.VideoCapture(path_data + 'collect_data_batch_3/' + action + '/' + video)
+            cap = cv2.VideoCapture(path_data + input+'/' + action + '/' + video)
             video_name = video.split('.')[0]
             subject = video_name[-1]
-            path_joint = path_data + 'handwash/collect_data_batch_3_one_hand/' + str(v_i) + '/' + action + '/'
+            path_joint = path_data + 'handwash/+'output+'/' + str(v_i) + '/' + action + '/'
             if not os.path.exists(path_joint):
                 os.makedirs(path_joint)
             f = open(path_joint + 'joint.txt', 'w')
