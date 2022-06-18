@@ -25,14 +25,14 @@ f.close()
 #model = keras.models.load_model("my_h5_model.h5")
 
 import time
-
+'''
 def Completion_matrix(new_sample):
     zero_row = np.where(~new_sample.any(axis=1))[0]
     if (len(zero_row) != 0):
         new_sample[zero_row, :] = 1
     return new_sample
 
-
+'''
 
 np.random.seed(0)
 
@@ -69,8 +69,8 @@ result_max = "begin"
 
 with mp_hands.Hands(model_complexity=0, min_detection_confidence=0.5, min_tracking_confidence=0.5) as hands:
 
-    cap = cv2.VideoCapture("/media/liang/ssd2/wash_hand_3/Domain-and-View-point-Agnostic-Hand-Action-Recognition-main/datasets/HandWashDataset_self/Step6/Step6_24.avi")
-#    cap = cv2.VideoCapture("/media/liang/ssd2/wash_hand_3/collect_data_all_recent_used!!!!!!!!!!/collect_data/11.avi")
+#    cap = cv2.VideoCapture("/media/liang/ssd2/wash_hand_3/Domain-and-View-point-Agnostic-Hand-Action-Recognition-main/datasets/HandWashDataset_self/Step6/Step6_24.avi")
+    cap = cv2.VideoCapture(0)#2
 
 
     while cap.isOpened():
@@ -94,15 +94,16 @@ with mp_hands.Hands(model_complexity=0, min_detection_confidence=0.5, min_tracki
         elif len(test_frames)==29:
             start = time.time()
             test_frames.append(image)
-            predict_data=[]
+            skeleton_data=[]
+            test_frames=[]
             for i in range(len(test_frames)):
-                predict_data.append(process_output_skelenton_to_array(hands.process(image)))
+                skeleton_data.append(process_output_skelenton_to_array(hands.process(image)))
 
 
             # here the input is a two frames .but only use the first one
-            data= np.float64(np.array(predict_data))
+            data= np.float64(np.array(skeleton_data))
 
-            new_sample = Completion_matrix(data)
+            new_sample = data
             data_AUG = np.float64(skele_augmentation(new_sample, model_params))
             print("Generate a prediction")
 

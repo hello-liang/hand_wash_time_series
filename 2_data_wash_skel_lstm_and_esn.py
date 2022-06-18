@@ -37,11 +37,6 @@ import random
 part = 0.3
 
 
-def Completion_matrix(new_sample):
-    zero_row = np.where(~new_sample.any(axis=1))[0]
-    if (len(zero_row) != 0):
-        new_sample[zero_row, :] = 1
-    return new_sample
 
 
 def load_file(filepath):
@@ -64,21 +59,30 @@ def get_train_test_data(path, train_list, test_list):
     import os
     data = os.listdir(path)
     for subj in data:
-        for step in os.listdir(path + "/" + subj):
-            y_class = int(step[-1]) - 1
+        for step in os.listdir(path + os.sep + subj):
+            if(len(step)==5):
+                y_class = int(step[-1]) - 1
+            elif(len(step)==1):
+                y_class = int(step[0]) - 1
+
+            else:
+                y_class = int(step[5]) - 1
+
+
             if int(subj) in train_list:
-                data = load_file(path + "/" + subj + "/" + step + "/" + "joint.txt")  # ndarray [405,63]
+                data = load_file(path + os.sep + subj + os.sep + step + os.sep + "joint.txt")  # ndarray [405,63]
                 for i in range(data.shape[0]):
                     if (i >= 30) & (random.random() < part):
-                        new_sample = Completion_matrix(data[(i - 30):i, :]) #ndarray
+                        new_sample = data[(i - 30):i, :]
+                        #ndarray
                         data_AUG = np.float64(skele_augmentation(new_sample, model_params))
                         trainX.append(data_AUG)
                         trainy.append(y_class)
             if int(subj) in test_list:
-                data = load_file(path + "/" + subj + "/" + step + "/" + "joint.txt")
+                data = load_file(path + os.sep + subj + os.sep + step + os.sep + "joint.txt")
                 for i in range(data.shape[0]):
                     if (i >= 30) & (random.random() < part):
-                        new_sample = Completion_matrix(data[(i - 30):i, :])
+                        new_sample = data[(i - 30):i, :]
                         data_AUG = np.float64(skele_augmentation(new_sample, model_params))
 
                         testX.append(data_AUG)
@@ -130,36 +134,37 @@ def train_lstm(trainX,trainy):
     model.fit(trainX, trainy, epochs=epochs, batch_size=batch_size, verbose=verbose)
     return model,batch_size
 # evaluate model
+def lstm_HandWashDataset_selfbatch_1_one_hand():
+    print("begin to test batch 1")
+    path="HandWashDataset_self_one_hand"
+    all_subject = list(range(1, 51))
+    random.shuffle(all_subject)
+    train_list=all_subject[0:35]
+    test_list=all_subject[35:50]
+    trainX,testX,testy,trainy=get_train_test_data(path, train_list, test_list)
+    trainX,testX,testy,trainy=process_lstm_train_test(trainX,testX,testy,trainy)
+    model,batch_size=train_lstm(trainX,trainy)         ##########only position for train
+    _, accuracy = model.evaluate(testX, testy, batch_size=batch_size, verbose=0)
+    accuracy = accuracy * 100.0
+    print('>#%d: %.3f' % (0 + 1, accuracy))
 
-print("begin to test batch 1")
-path="HandWashDataset_self_one_hand"
-all_subject = list(range(1, 51))
-random.shuffle(all_subject)
-train_list=all_subject[0:35]
-test_list=all_subject[35:50]
-trainX,testX,testy,trainy=get_train_test_data(path, train_list, test_list)
-trainX,testX,testy,trainy=process_lstm_train_test(trainX,testX,testy,trainy)
-model,batch_size=train_lstm(trainX,trainy)         ##########only position for train
-_, accuracy = model.evaluate(testX, testy, batch_size=batch_size, verbose=0)
-accuracy = accuracy * 100.0
-print('>#%d: %.3f' % (0 + 1, accuracy))
+def lstm_collect_data_batch_3_one_hand():
 
-
-print("begin to test batch_3_data")
-path = "collect_data_batch_3_one_hand"
-all_subject = list(range(1, 12))
-random.shuffle(all_subject)
-train_list = all_subject[0:6]
-test_list = all_subject[6:12]
-trainX,testX,testy,trainy=get_train_test_data(path, train_list, test_list)
-trainX,testX,testy,trainy=process_lstm_train_test(trainX,testX,testy,trainy)
-model,batch_size=train_lstm(trainX,trainy)
-_, accuracy = model.evaluate(testX, testy, batch_size=batch_size, verbose=0)
-accuracy = accuracy * 100.0
-print('>#%d: %.3f' % (0 + 1, accuracy))
+    print("begin to test batch_3_data")
+    path = "collect_data_batch_3_one_hand"
+    all_subject = list(range(1, 12))
+    random.shuffle(all_subject)
+    train_list = all_subject[0:6]
+    test_list = all_subject[6:12]
+    trainX,testX,testy,trainy=get_train_test_data(path, train_list, test_list)
+    trainX,testX,testy,trainy=process_lstm_train_test(trainX,testX,testy,trainy)
+    model,batch_size=train_lstm(trainX,trainy)
+    _, accuracy = model.evaluate(testX, testy, batch_size=batch_size, verbose=0)
+    accuracy = accuracy * 100.0
+    print('>#%d: %.3f' % (0 + 1, accuracy))
 
 # Calling `save('my_model.h5')` creates a h5 file `my_model.h5`.
-model.save("my_h5_model.h5")
+#model.save("my_h5_model.h5")
 # It can be used to reconstruct the model identically.
 #reconstructed_model = keras.models.load_model("my_h5_model.h5")
 
@@ -266,38 +271,73 @@ classifier =  RC_model(
 
 # data_batch_1
 
-print("begin to test batch 111111111111111111111111111111111111111111111111")
+def wsn_HandWashDataset_self_batch_1_one_hand():
+    print("begin to test batch 1")
 
-path="HandWashDataset_self_one_hand"
-all_subject = list(range(1, 51))
-random.shuffle(all_subject)
-train_list=all_subject[0:35]
-test_list=all_subject[35:50]
-trainX,testX,testy,trainy=get_train_test_data(path, train_list, test_list)
+    path="HandWashDataset_self_one_hand"
+    all_subject = list(range(1, 51))
+    random.shuffle(all_subject)
+    train_list=all_subject[0:35]
+    test_list=all_subject[35:50]
+    trainX,testX,testy,trainy=get_train_test_data(path, train_list, test_list)
 
-Xtr, Ytr, Xte, Yte = process_esn_train_test(trainX,testX,testy,trainy)
+    Xtr, Ytr, Xte, Yte = process_esn_train_test(trainX,testX,testy,trainy)
 
-tr_time = classifier.train(Xtr, Ytr) #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!important only position to train
-accuracy, f1, pred_class= classifier.test(Xte, Yte)
-print('Accuracy = %.3f, F1 = %.3f'%(accuracy, f1))
+    tr_time = classifier.train(Xtr, Ytr) #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!important only position to train
+    accuracy, f1, pred_class= classifier.test(Xte, Yte)
+    print('Accuracy = %.3f, F1 = %.3f'%(accuracy, f1))
+
+def esn_collect_data_batch_3_one_hand():
+    print("esn_begin to test batch_3_data")
+    path = "collect_data_batch_3_one_hand"
+    all_subject = list(range(1, 12))
+    random.shuffle(all_subject)
+    train_list = all_subject[0:6]
+    test_list = all_subject[6:12]
+    trainX,testX,testy,trainy=get_train_test_data(path, train_list, test_list)
+    Xtr, Ytr, Xte, Yte = process_esn_train_test(trainX,testX,testy,trainy)
+
+    tr_time = classifier.train(Xtr, Ytr)
+    accuracy, f1, pred_class = classifier.test(Xte, Yte)
+    pred_class = classifier.predict(Xte)
+
+    print('Accuracy = %.3f, F1 = %.3f'%(accuracy, f1))
+
+def esn_hand_wash_kaggle():
+    print("esn_hand_wash_kaggle")
+    path = "hand_wash_kaggle"
+    all_subject = list(range(1, 26))
+    random.shuffle(all_subject)
+    train_list = all_subject[0:20]
+    test_list = all_subject[20:25]
+    trainX,testX,testy,trainy=get_train_test_data(path, train_list, test_list)
+    Xtr, Ytr, Xte, Yte = process_esn_train_test(trainX,testX,testy,trainy)
+
+    tr_time = classifier.train(Xtr, Ytr)
+    accuracy, f1, pred_class = classifier.test(Xte, Yte)
+    pred_class = classifier.predict(Xte)
+
+    print('Accuracy = %.3f, F1 = %.3f'%(accuracy, f1))
+
+def esn_hand_J_L_one():
+    print("esn_hand_wash_kaggle")
+    path = "skeleton_hand_wash_J_L_one"
+    all_subject = list(range(1, 10))
+    random.shuffle(all_subject)
+    train_list = all_subject[0:8]
+    test_list = all_subject[8:10]
+    trainX,testX,testy,trainy=get_train_test_data(path, train_list, test_list)
+    Xtr, Ytr, Xte, Yte = process_esn_train_test(trainX,testX,testy,trainy)
+
+    tr_time = classifier.train(Xtr, Ytr)
+    accuracy, f1, pred_class = classifier.test(Xte, Yte)
+    pred_class = classifier.predict(Xte)
+
+    print('Accuracy = %.3f, F1 = %.3f'%(accuracy, f1))
 
 
-print("begin to test batch_3_data_3333333333333333333333333333333333333333333")
-path = "collect_data_batch_3_one_hand"
-all_subject = list(range(1, 12))
-random.shuffle(all_subject)
-train_list = all_subject[0:6]
-test_list = all_subject[6:12]
-trainX,testX,testy,trainy=get_train_test_data(path, train_list, test_list)
-Xtr, Ytr, Xte, Yte = process_esn_train_test(trainX,testX,testy,trainy)
-
-tr_time = classifier.train(Xtr, Ytr)
-accuracy, f1, pred_class = classifier.test(Xte, Yte)
-pred_class = classifier.predict(Xte)
-
-print('Accuracy = %.3f, F1 = %.3f'%(accuracy, f1))
-
-
+#esn_hand_wash_kaggle()
+esn_hand_J_L_one()
 f= open('classifier.pckl','wb')
 pickle.dump(classifier,f)
 f.close()
