@@ -34,9 +34,9 @@ from keras.layers import LSTM
 from tensorflow.keras.utils import to_categorical
 from matplotlib import pyplot
 import random
-part = 0.3
-num_frame_analysis=30
-skip=3
+part = 0.3 # the part of data to analysis
+num_frame_analysis=30 #the length of frames to analysis
+skip=3# can skip some frame to analysis
 
 
 def load_file(filepath):
@@ -71,8 +71,8 @@ def get_train_test_data(path, train_list, test_list):
             if int(subj) in train_list:
                 data = load_file(path + os.sep + subj + os.sep + step + os.sep + "joint.txt")  # ndarray [405,63]
                 for i in range(data.shape[0]):
-                    if (i >= 30) & (random.random() < part):
-                        new_sample = data[(i - 30):i:skip, :]
+                    if (i >= num_frame_analysis) & (random.random() < part):
+                        new_sample = data[(i - num_frame_analysis):i:skip, :]
 
                         #ndarray
                         data_AUG = np.float64(skele_augmentation(new_sample, model_params))
@@ -81,8 +81,8 @@ def get_train_test_data(path, train_list, test_list):
             if int(subj) in test_list:
                 data = load_file(path + os.sep + subj + os.sep + step + os.sep + "joint.txt")
                 for i in range(data.shape[0]):
-                    if (i >= 30) & (random.random() < part):
-                        new_sample = data[(i - 30):i:skip, :]
+                    if (i >= num_frame_analysis) & (random.random() < part):
+                        new_sample = data[(i - num_frame_analysis):i:skip, :]
                         data_AUG = np.float64(skele_augmentation(new_sample, model_params))
 
                         testX.append(data_AUG)
