@@ -305,7 +305,7 @@ def esn_collect_data_batch_3_one_hand():
 
 def esn_hand_wash_kaggle():
     print("esn_hand_wash_kaggle")
-    path = "hand_wash_kaggle"
+    path = "skeleton_hand_wash_kaggle_one"
     all_subject = list(range(1, 26))
     random.shuffle(all_subject)
     train_list = all_subject[0:20]
@@ -320,8 +320,7 @@ def esn_hand_wash_kaggle():
     print('Accuracy = %.3f, F1 = %.3f'%(accuracy, f1))
 
 def esn_hand_J_L_one():
-    print("esn_hand_wash_kaggle")
-    path = "skeleton_hand_wash_J_L_one"
+    path = "skeleton_me_jianxhee"
     all_subject = list(range(1, 10))
     random.shuffle(all_subject)
     train_list = all_subject[0:8]
