@@ -369,7 +369,7 @@ def esn_hand_J_L_one():
 esn_hand_J_L_one()
 only_test_esn_hand_wash_kaggle()
 only_test_wsn_HandWashDataset_self_batch_1_one_hand()
-f= open('classifier.pckl','wb')
+f= open('classifier_30fps.pckl', 'wb')
 pickle.dump(classifier,f)
 f.close()
 

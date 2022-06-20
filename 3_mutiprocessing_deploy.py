@@ -27,7 +27,7 @@ model_params=pickle.load(f)
 f.close()
 
 
-f = open('classifier.pckl', 'rb')
+f = open('classifier_30fps.pckl', 'rb')
 classifier = pickle.load(f)
 f.close()
 

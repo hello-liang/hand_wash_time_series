@@ -35,8 +35,8 @@ from tensorflow.keras.utils import to_categorical
 from matplotlib import pyplot
 import random
 part = 0.3
-
-
+num_frame_analysis=30
+skip=3
 
 
 def load_file(filepath):
@@ -72,7 +72,8 @@ def get_train_test_data(path, train_list, test_list):
                 data = load_file(path + os.sep + subj + os.sep + step + os.sep + "joint.txt")  # ndarray [405,63]
                 for i in range(data.shape[0]):
                     if (i >= 30) & (random.random() < part):
-                        new_sample = data[(i - 30):i, :]
+                        new_sample = data[(i - 30):i:skip, :]
+
                         #ndarray
                         data_AUG = np.float64(skele_augmentation(new_sample, model_params))
                         trainX.append(data_AUG)
@@ -81,7 +82,7 @@ def get_train_test_data(path, train_list, test_list):
                 data = load_file(path + os.sep + subj + os.sep + step + os.sep + "joint.txt")
                 for i in range(data.shape[0]):
                     if (i >= 30) & (random.random() < part):
-                        new_sample = data[(i - 30):i, :]
+                        new_sample = data[(i - 30):i:skip, :]
                         data_AUG = np.float64(skele_augmentation(new_sample, model_params))
 
                         testX.append(data_AUG)
@@ -369,7 +370,7 @@ def esn_hand_J_L_one():
 esn_hand_J_L_one()
 only_test_esn_hand_wash_kaggle()
 only_test_wsn_HandWashDataset_self_batch_1_one_hand()
-f= open('classifier.pckl','wb')
+f= open('classifier.pckl', 'wb')
 pickle.dump(classifier,f)
 f.close()
 
