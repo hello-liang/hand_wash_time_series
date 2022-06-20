@@ -12,7 +12,8 @@ import numpy as np
 from skel_aug import skele_augmentation
 import pickle
 
-
+from utils import process_output_skelenton_to_array
+import re
 f= open('store.pckl','rb')
 model_params=pickle.load(f)
 f.close()
@@ -24,14 +25,7 @@ f.close()
 #model = keras.models.load_model("my_h5_model.h5")
 
 import time
-'''
-def Completion_matrix(new_sample):
-    zero_row = np.where(~new_sample.any(axis=1))[0]
-    if (len(zero_row) != 0):
-        new_sample[zero_row, :] = 1
-    return new_sample
 
-'''
 
 np.random.seed(0)
 
@@ -47,20 +41,6 @@ mp_hands = mp.solutions.hands
 import re
 
 
-# 50 guys do 6 action
-def process_output_skelenton_to_array(results):
-    # not sure the type of mediapipe output ,I use this function convert it to array
-    out = ['1'] * 63
-    # Print handedness and draw hand landmarks on the image.
-    if not results.multi_hand_landmarks:
-        out = out
-        # can not find a hand ,initialize to 0
-    else:
-        # only choose the first one hand
-        hand_landmarks = str(results.multi_hand_landmarks[0])
-        hand_landmarks = re.split('\n}\nlandmark {\n  x: |\n  y: |\n  z: |\n}\n|landmark {\n  x: ', hand_landmarks)
-        out = hand_landmarks[1:64]
-    return out
 
 test_frames=[]
 # For static images:

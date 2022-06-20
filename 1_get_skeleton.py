@@ -5,6 +5,7 @@ import mediapipe as mp
 import numpy as np
 import os
 
+from utils import process_output_skelenton_to_array
 
 mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles

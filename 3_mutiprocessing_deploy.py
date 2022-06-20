@@ -19,6 +19,7 @@ import mediapipe as mp
 from multiprocessing import Process
 from multiprocessing import Queue
 from skel_aug import skele_augmentation
+from utils import process_output_skelenton_to_array
 
 import pickle
 f= open('store.pckl','rb')
@@ -30,7 +31,7 @@ f = open('classifier.pckl', 'rb')
 classifier = pickle.load(f)
 f.close()
 
-def classify_frame(skele_augmentation,classifier,model_params, inputQueue,outputQueue):  # only for input a frame ,output a accuracy,that's all
+def classify_frame(process_output_skelenton_to_array,skele_augmentation,classifier,model_params, inputQueue,outputQueue):  # only for input a frame ,output a accuracy,that's all
 
 
 
@@ -46,20 +47,6 @@ def classify_frame(skele_augmentation,classifier,model_params, inputQueue,output
             # check to see if there is a frame in our input queue
             if not inputQueue.empty():
 
-                def process_output_skelenton_to_array(results):
-                    # not sure the type of mediapipe output ,I use this function convert it to array
-                    out = ['1'] * 63
-                    # Print handedness and draw hand landmarks on the image.
-                    if not results.multi_hand_landmarks:
-                        out = out
-                        # can not find a hand ,initialize to 0
-                    else:
-                        # only choose the first one hand
-                        hand_landmarks = str(results.multi_hand_landmarks[0])
-                        hand_landmarks = re.split('\n}\nlandmark {\n  x: |\n  y: |\n  z: |\n}\n|landmark {\n  x: ',
-                                                  hand_landmarks)
-                        out = hand_landmarks[1:64]
-                    return out
 
                 test_frames = inputQueue.get()
                 start = time.time()
@@ -90,7 +77,7 @@ if __name__ == '__main__':
     detections = None
     # construct a child process *indepedent* from our main process of
 
-    p = Process(target=classify_frame, args=( skele_augmentation,classifier, model_params, inputQueue,
+    p = Process(target=classify_frame, args=( process_output_skelenton_to_array,skele_augmentation,classifier, model_params, inputQueue,
                                                  outputQueue,))
     p.daemon = True
     p.start()
