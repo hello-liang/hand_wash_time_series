@@ -111,7 +111,7 @@ if __name__ == '__main__':
                 print(333)
 
                 prediction = detections
-                result_max = str(prediction[0])
+                result_max = str(prediction[0]+1)
 
             test_frames = []
 

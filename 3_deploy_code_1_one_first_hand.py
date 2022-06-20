@@ -70,7 +70,7 @@ with mp_hands.Hands(model_complexity=0, min_detection_confidence=0.5, min_tracki
             data_AUG=numpy.expand_dims(data_AUG ,axis=0)
             prediction = classifier.predict(data_AUG)
             test_frames=[]
-            result_max=str(prediction[0])
+            result_max=str(prediction[0]+1)
             end = time.time()
             print(end - start)
         cv2.putText(image,result_max ,(100,100), cv2.FONT_HERSHEY_SIMPLEX, 2,(0,0,0), 2, 0)   #(col,row) begin
