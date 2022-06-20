@@ -9,7 +9,7 @@ only change line 39 41 42 and 126 ,134,and11~13 change the label number and path
 import os
 #os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
 
-num_frame_analysis=30
+num_frame_analysis=10
 import numpy
 import numpy as np
 import re

@@ -6,7 +6,7 @@ Created on Thu Jan 14 10:19:18 2021
 @author: asabater
 """
 #hyper parameter
-num_frame_analysis=30
+num_frame_analysis=10
 import numpy
 import numpy as np
 from skel_aug import skele_augmentation
