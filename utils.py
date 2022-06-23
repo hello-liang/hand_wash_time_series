@@ -1,6 +1,7 @@
 import re
 import numpy as np
 # 50 guys do 6 action
+'''
 def process_output_skelenton_to_array(results):
     # not sure the type of mediapipe output ,I use this function convert it to array
     out = ['1'] * 63
@@ -15,12 +16,12 @@ def process_output_skelenton_to_array(results):
         out = hand_landmarks[1:64]
     return out
 
-
+'''
 
 # 50 guys do 6 action
-def process_output_skelenton_to_array_muti_hand(results):
+def process_output_skelenton_to_array(results):
     # not sure the type of mediapipe output ,I use this function convert it to array
-    out = np.ones(126)
+    out = ['1'] * 126
     # Print handedness and draw hand landmarks on the image.
     if not results.multi_hand_landmarks:
         out = out
@@ -51,6 +52,7 @@ def process_output_skelenton_to_array_muti_hand(results):
         hand_landmarks = re.split('\n}\nlandmark {\n  x: |\n  y: |\n  z: |\n}\n|landmark {\n  x: ', hand_landmarks)
         out[63:126] = hand_landmarks[1:64]
     else:
+        out = out
         print("have more than two hand？")
         print(len(results.multi_handedness))
-    return str(out.tolist())
+    return out
