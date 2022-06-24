@@ -36,6 +36,7 @@ from matplotlib import pyplot
 import random
 part = 0.3
 
+num_frame_analysis=10 #the length of frames to analysis
 
 
 
@@ -80,8 +81,8 @@ def get_train_test_data(path, train_list, test_list):
             if int(subj) in train_list:
                 data = load_file(path + os.sep + subj + os.sep + step + os.sep + "joint.txt")  # ndarray [405,63]
                 for i in range(data.shape[0]):
-                    if (i >= 30) & (random.random() < part):
-                        new_sample = data[(i - 30):i, :]
+                    if (i >= num_frame_analysis) & (random.random() < part):
+                        new_sample = data[(i - num_frame_analysis):i, :]
                         data_AUG = data_AUG_identify_one_or_two(new_sample, model_params)
 
                         trainX.append(data_AUG)
@@ -89,8 +90,8 @@ def get_train_test_data(path, train_list, test_list):
             if int(subj) in test_list:
                 data = load_file(path + os.sep + subj + os.sep + step + os.sep + "joint.txt")
                 for i in range(data.shape[0]):
-                    if (i >= 30) & (random.random() < part):
-                        new_sample = data[(i - 30):i, :]
+                    if (i >= num_frame_analysis) & (random.random() < part):
+                        new_sample = data[(i - num_frame_analysis):i, :]
                         data_AUG = data_AUG_identify_one_or_two(new_sample, model_params)
 
                         testX.append(data_AUG)
@@ -378,7 +379,7 @@ def esn_hand_J_L_one():
 esn_hand_J_L_one()
 #only_test_esn_hand_wash_kaggle()
 #only_test_wsn_HandWashDataset_self_batch_1_one_hand()
-f= open('classifier_30fps.pckl', 'wb')
+f= open('classifier.pckl', 'wb')
 pickle.dump(classifier,f)
 f.close()
 

@@ -109,9 +109,7 @@ if __name__ == '__main__':
         else:
 
             if inputQueue.empty():
-                print(111)
                 inputQueue.put(test_frames)
-                print(222)
 
             # if the output queue *is not* empty, grab the detections
             if not outputQueue.empty():
@@ -119,7 +117,6 @@ if __name__ == '__main__':
                 detections = outputQueue.get()
             # draw the detections on the frame)
             if detections is not None:
-                print(333)
 
                 prediction = detections
                 result_max = str(prediction[0]+1)
