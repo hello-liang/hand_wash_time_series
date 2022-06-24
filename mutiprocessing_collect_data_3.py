@@ -154,7 +154,9 @@ def collect_data():
     print(cap.get(4))
 
     print(cap.get(5))
-
+    p.terminate()
+    print('stop process')
+    p.join()
     cap.release()
     cv2.destroyAllWindows()
 

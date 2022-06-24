@@ -152,7 +152,9 @@ def predict_collect():
     print(num_f/wash_time)
     print(cap.get(3))
     print(cap.get(4))
-
+    p.terminate()
+    print('stop process')
+    p.join()
     print(cap.get(5))
     cap.release()
     cv2.destroyAllWindows()
