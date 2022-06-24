@@ -15,15 +15,15 @@ print("recent work path should be ..../hand_wash_time_series")
 print(os.getcwd()) #should be (...../hand_wash_time_series)
 
 #input="archive"+os.sep+"HandWashDataset"+os.sep+"HandWashDataset"
-input="collect_data_batch_2"
+input="magic_mirror_muti_core"
 
-output="skeleton_ppum_batch_2"
+output="skeleton_magic_mirror_muti_core"
 print(os.getcwd())  # should be (/media/liang/ssd2/wash_hand_3/hand_wash_time_series)
 
 
 
 # For static images:
-with mp_hands.Hands(model_complexity=0, min_detection_confidence=0.5, min_tracking_confidence=0.5) as hands:
+with mp_hands.Hands(min_detection_confidence=0.5, min_tracking_confidence=0.5) as hands:
 
     for action in os.listdir( input+os.sep):
         v_i = 0

@@ -216,24 +216,11 @@ def esn_hand_J_L_one():
 
     print('Accuracy = %.3f, F1 = %.3f'%(accuracy, f1))
 
-def only_test_esn_hand_wash_kaggle():
-    print("esn_hand_wash_kaggle")
-    path = "skeleton_hand_wash_kaggle_one"
-    all_subject = list(range(1, 26))
-    random.shuffle(all_subject)
-    train_list = all_subject[0:20]
-    test_list = all_subject[20:25]
-    trainX,testX,testy,trainy=get_train_test_data(path, train_list, test_list)
-    Xtr, Ytr, Xte, Yte = process_esn_train_test(trainX,testX,testy,trainy)
 
-    accuracy, f1, pred_class = classifier.test(Xte, Yte)
-    pred_class = classifier.predict(Xte)
-
-    print('Accuracy = %.3f, F1 = %.3f'%(accuracy, f1))
 
 #esn_hand_wash_kaggle()
 esn_hand_J_L_one()
-#only_test_esn_hand_wash_kaggle()
+
 f= open('classifier.pckl', 'wb')
 pickle.dump(classifier,f)
 f.close()
