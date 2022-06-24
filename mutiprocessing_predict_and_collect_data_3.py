@@ -133,7 +133,6 @@ def predict_collect():
             # If loading a video, use 'break' instead of 'continue'.
             break
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        time.sleep(0.1)
         if len(test_frames) < num_frame_analysis:  # maybe need over the tcn length?
             test_frames.append(image)
         else:
