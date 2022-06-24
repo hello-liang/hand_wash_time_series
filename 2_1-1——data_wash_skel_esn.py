@@ -51,8 +51,8 @@ def data_AUG_identify_one_or_two(new_sample,model_params):
     if (new_sample.shape[1] == 63):  # use for one hand
         data_AUG = np.float64(skele_augmentation(new_sample, model_params))
     else: # 2 hand
-        data_AUG_left = np.float64(skele_augmentation(new_sample, model_params))
-        data_AUG_right = np.float64(skele_augmentation(new_sample, model_params))
+        data_AUG_left = np.float64(skele_augmentation(new_sample[:,0:63], model_params))
+        data_AUG_right = np.float64(skele_augmentation(new_sample[:,63:126], model_params))
         data_AUG = np.concatenate((data_AUG_left, data_AUG_right), axis=1)
     return data_AUG
 
@@ -233,7 +233,7 @@ def only_test_esn_hand_wash_kaggle():
 #esn_hand_wash_kaggle()
 esn_hand_J_L_one()
 #only_test_esn_hand_wash_kaggle()
-f= open('classifier_30fps.pckl', 'wb')
+f= open('classifier.pckl', 'wb')
 pickle.dump(classifier,f)
 f.close()
 

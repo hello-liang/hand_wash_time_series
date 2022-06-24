@@ -19,7 +19,7 @@ model_params=pickle.load(f)
 f.close()
 
 
-f = open('classifier_30fps.pckl', 'rb')
+f = open('classifier.pckl', 'rb')
 classifier = pickle.load(f)
 f.close()
 #model = keras.models.load_model("my_h5_model.h5")
@@ -40,7 +40,15 @@ mp_drawing_styles = mp.solutions.drawing_styles
 mp_hands = mp.solutions.hands
 import re
 
-
+def data_AUG_identify_one_or_two(new_sample,model_params):
+    # ndarray
+    if (new_sample.shape[1] == 63):  # use for one hand
+        data_AUG = np.float64(skele_augmentation(new_sample, model_params))
+    else: # 2 hand
+        data_AUG_left = np.float64(skele_augmentation(new_sample[:,0:63], model_params))
+        data_AUG_right = np.float64(skele_augmentation(new_sample[:,63:126], model_params))
+        data_AUG = np.concatenate((data_AUG_left, data_AUG_right), axis=1)
+    return data_AUG
 
 test_frames=[]
 # For static images:
@@ -65,8 +73,10 @@ with mp_hands.Hands(model_complexity=0, min_detection_confidence=0.5, min_tracki
                 skeleton=hands.process(test_frames[i])
                 skeleton_data.append(process_output_skelenton_to_array(skeleton))
             # here the input is a two frames .but only use the first one
-            data= np.float64(np.array(skeleton_data))
-            data_AUG = np.float64(skele_augmentation(data, model_params))
+            new_sample= np.float64(np.array(skeleton_data))
+
+            data_AUG = data_AUG_identify_one_or_two(new_sample, model_params)
+
             data_AUG=numpy.expand_dims(data_AUG ,axis=0)
             prediction = classifier.predict(data_AUG)
             test_frames=[]
