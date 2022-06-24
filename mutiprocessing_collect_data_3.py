@@ -79,7 +79,22 @@ def classify_frame(process_output_skelenton_to_array,skele_augmentation,classifi
 
 # ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
 
-if __name__ == '__main__':
+def collect_data():
+    folder = 'collect_data'
+    video_name = os.listdir(folder)
+    begin = 0
+    if len(video_name) == 0:
+        begin = 0
+    else:
+        for i in range(len(video_name)):
+            num_video = int(video_name[i].split('.')[0])
+            if begin < num_video:
+                begin = num_video
+    start_all_time = time.time()
+    cost_control_time = time.time() - start_all_time
+    wash_time = 11
+    num_f=0
+
 
     # initialize the input queue (frames), output queue (detections),
     # and the list of actual detections returned by the child process
@@ -97,8 +112,15 @@ if __name__ == '__main__':
         #    cap = cv2.VideoCapture("/media/liang/ssd2/wash_hand_3/Domain-and-View-point-Agnostic-Hand-Action-Recognition-main/datasets/HandWashDataset_self/Step6/Step6_24.avi")
     cap = cv2.VideoCapture(0)  # 2
     test_frames = []
-    while cap.isOpened():
+    # Define the codec and create VideoWriter object
+    fourcc = cv2.VideoWriter_fourcc(*'XVID')
+    out = cv2.VideoWriter(folder+'/' + str(begin + 1) + '.avi', fourcc, 10, (640, 480))
+    while cost_control_time < wash_time:
+        num_f+=1
         success, image = cap.read()
+        out.write(image)
+        cost_control_time = time.time() - start_all_time
+
         if not success:
             print("Ignoring empty camera frame.")
             # If loading a video, use 'break' instead of 'continue'.
@@ -123,10 +145,15 @@ if __name__ == '__main__':
 
             test_frames = []
 
-        cv2.putText(image, result_max, (100, 100), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 0), 2, 0)  # (col,row) begin
+        cv2.putText(image, "begin", (100, 100), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 0), 2, 0)  # (col,row) begin
         cv2.imshow('MediaPipe Hands', image)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
+    print(num_f/wash_time)
+    print(cap.get(3))
+    print(cap.get(4))
+
+    print(cap.get(5))
 
     cap.release()
     cv2.destroyAllWindows()
