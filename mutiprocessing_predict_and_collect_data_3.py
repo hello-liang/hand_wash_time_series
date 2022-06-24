@@ -97,7 +97,7 @@ def predict_collect():
                 begin = num_video
     start_all_time = time.time()
     cost_control_time = time.time() - start_all_time
-    wash_time = 100
+    wash_time = 1000
     num_f=0
 
 
