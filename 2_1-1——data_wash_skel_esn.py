@@ -202,7 +202,7 @@ classifier =  RC_model(
 
 
 def esn_hand_J_L_one():
-    path = "skeleton_me_jianxhee_2_hand"
+    path = "skeleton_magic_mirror_muti_core"
     all_subject = list(range(1, 10))
     random.shuffle(all_subject)
     train_list = all_subject[0:8]
