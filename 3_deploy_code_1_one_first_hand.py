@@ -53,7 +53,7 @@ def data_AUG_identify_one_or_two(new_sample,model_params):
 test_frames=[]
 # For static images:
 result_max = "begin"
-with mp_hands.Hands(model_complexity=0, min_detection_confidence=0.5, min_tracking_confidence=0.5) as hands:
+with mp_hands.Hands( min_detection_confidence=0.5, min_tracking_confidence=0.5) as hands:
 
 #    cap = cv2.VideoCapture("/media/liang/ssd2/wash_hand_3/Domain-and-View-point-Agnostic-Hand-Action-Recognition-main/datasets/HandWashDataset_self/Step6/Step6_24.avi")
     cap = cv2.VideoCapture(0)#2
