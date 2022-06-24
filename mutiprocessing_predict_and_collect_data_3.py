@@ -165,4 +165,3 @@ def predict_collect():
     cap.release()
     cv2.destroyAllWindows()
 
-predict_collect()
