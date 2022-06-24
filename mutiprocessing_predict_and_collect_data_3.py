@@ -136,6 +136,8 @@ def predict_collect():
         if len(test_frames) < num_frame_analysis:  # maybe need over the tcn length?
             test_frames.append(image)
         else:
+            test_frames.append(image)
+
 
             if inputQueue.empty():
                 inputQueue.put(test_frames)
