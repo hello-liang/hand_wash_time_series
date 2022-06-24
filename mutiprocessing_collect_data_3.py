@@ -132,8 +132,6 @@ def collect_data():
         if len(test_frames) < num_frame_analysis:  # maybe need over the tcn length?
             test_frames.append(image)
         else:
-            test_frames.append(image)
-
 
             if inputQueue.empty():
                 inputQueue.put(test_frames)
@@ -148,7 +146,7 @@ def collect_data():
                 prediction = detections
                 result_max = str(prediction[0]+1)
 
-            test_frames = test_frames[(len(test_frames)-num_frame_analysis):len(test_frames)]
+            test_frames = []
 
         cv2.putText(image, "begin", (100, 100), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 0), 2, 0)  # (col,row) begin
         cv2.imshow('MediaPipe Hands', image)
