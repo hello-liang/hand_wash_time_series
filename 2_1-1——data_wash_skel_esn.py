@@ -1,7 +1,8 @@
 #still need to do ,1, shuffle
 
-num_frame_analysis=10
+num_frame_analysis=20
 part = 0.3
+skip=2
 
 import numpy as np
 from data_generator import DataGenerator
@@ -82,7 +83,7 @@ def get_train_test_data(path, train_list, test_list):
                 data = load_file(path + os.sep + subj + os.sep + step + os.sep + "joint.txt")  # ndarray [405,63]
                 for i in range(data.shape[0]):
                     if (i >= num_frame_analysis) & (random.random() < part):
-                        new_sample = data[(i - num_frame_analysis):i, :]
+                        new_sample = data[(i - num_frame_analysis):i:skip, :]
                         data_AUG = data_AUG_identify_one_or_two(new_sample, model_params)
 
                         trainX.append(data_AUG)
@@ -91,7 +92,7 @@ def get_train_test_data(path, train_list, test_list):
                 data = load_file(path + os.sep + subj + os.sep + step + os.sep + "joint.txt")
                 for i in range(data.shape[0]):
                     if (i >= num_frame_analysis) & (random.random() < part):
-                        new_sample = data[(i - num_frame_analysis):i, :]
+                        new_sample = data[(i - num_frame_analysis):i:skip, :]
                         data_AUG = data_AUG_identify_one_or_two(new_sample, model_params)
 
                         testX.append(data_AUG)

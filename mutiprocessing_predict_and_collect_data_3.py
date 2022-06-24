@@ -8,8 +8,11 @@ only change line 39 41 42 and 126 ,134,and11~13 change the label number and path
 # ok ,model load must put in the second processer function
 import os
 #os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
+num_frame_analysis=20
+part = 0.3
+skip=2
 
-num_frame_analysis=10
+
 import numpy
 import numpy as np
 import re
@@ -66,12 +69,14 @@ def classify_frame(process_output_skelenton_to_array,skele_augmentation,classifi
                 # here the input is a two frames .but only use the first one
 
                 new_sample = np.float64(np.array(skeleton_data))
-
+                new_sample=new_sample[0:new_sample.shape[0]:skip,:]
                 data_AUG = data_AUG_identify_one_or_two(new_sample, model_params)
 
                 data_AUG = numpy.expand_dims(data_AUG, axis=0)
                 prediction = classifier.predict(data_AUG)
                 detections = prediction
+                print(detections)
+
 
                 # write the detections to the output queue
                 outputQueue.put(detections)
@@ -92,7 +97,7 @@ def predict_collect():
                 begin = num_video
     start_all_time = time.time()
     cost_control_time = time.time() - start_all_time
-    wash_time = 11
+    wash_time = 100
     num_f=0
 
 
@@ -110,7 +115,9 @@ def predict_collect():
 
     result_max="begin"
         #    cap = cv2.VideoCapture("/media/liang/ssd2/wash_hand_3/Domain-and-View-point-Agnostic-Hand-Action-Recognition-main/datasets/HandWashDataset_self/Step6/Step6_24.avi")
+#    cap = cv2.VideoCapture("/media/liang/ssd2/wash_hand_3/hand_wash_time_series/magic_mirror_muti_core/Step_5/49.avi")  # 2
     cap = cv2.VideoCapture(0)  # 2
+
     test_frames = []
     # Define the codec and create VideoWriter object
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
@@ -126,6 +133,7 @@ def predict_collect():
             # If loading a video, use 'break' instead of 'continue'.
             break
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        time.sleep(0.1)
         if len(test_frames) < num_frame_analysis:  # maybe need over the tcn length?
             test_frames.append(image)
         else:
@@ -144,7 +152,6 @@ def predict_collect():
                 result_max = str(prediction[0]+1)
 
             test_frames = []
-
         cv2.putText(image, result_max, (100, 100), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 0), 2, 0)  # (col,row) begin
         cv2.imshow('MediaPipe Hands', image)
         if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -152,10 +159,11 @@ def predict_collect():
     print(num_f/wash_time)
     print(cap.get(3))
     print(cap.get(4))
-    p.terminate()
+#    p.terminate()
     print('stop process')
-    p.join()
+#    p.join()
     print(cap.get(5))
     cap.release()
     cv2.destroyAllWindows()
 
+predict_collect()

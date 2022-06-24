@@ -8,8 +8,9 @@ only change line 39 41 42 and 126 ,134,and11~13 change the label number and path
 # ok ,model load must put in the second processer function
 import os
 #os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
-
-num_frame_analysis=10
+num_frame_analysis=20
+part = 0.3
+skip=2
 import numpy
 import numpy as np
 import re
@@ -66,6 +67,8 @@ def classify_frame(process_output_skelenton_to_array,skele_augmentation,classifi
                 # here the input is a two frames .but only use the first one
 
                 new_sample = np.float64(np.array(skeleton_data))
+                new_sample=new_sample[0:new_sample.shape[0]:skip,:]
+
 
                 data_AUG = data_AUG_identify_one_or_two(new_sample, model_params)
 
